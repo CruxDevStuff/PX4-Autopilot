@@ -160,7 +160,7 @@ private:
 	uint16_t current_item_count();
 
 	/** get the crc32 checksum for the current _mission_type */
-	uint32_t current_item_crc();
+	uint32_t get_current_mission_type_crc();
 
 	/* do not allow top copying this class */
 	MavlinkMissionManager(MavlinkMissionManager &);

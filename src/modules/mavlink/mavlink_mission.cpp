@@ -409,7 +409,7 @@ MavlinkMissionManager::current_item_count()
 }
 
 uint32_t
-MavlinkMissionManager::current_item_crc()
+MavlinkMissionManager::get_current_mission_type_crc()
 {
 	if (_mission_type >= sizeof(_crc32) / sizeof(_crc32[0])) {
 		PX4_ERR("WPM: _crc32 out of bounds (%u)", _mission_type);
@@ -746,7 +746,7 @@ MavlinkMissionManager::handle_mission_request_list(const mavlink_message_t *msg)
 				PX4_DEBUG("WPM: MISSION_REQUEST_LIST OK nothing to send, mission is empty, mission type=%i", _mission_type);
 			}
 
-			send_mission_count(msg->sysid, msg->compid, _transfer_count, _mission_type, current_item_crc());
+			send_mission_count(msg->sysid, msg->compid, _transfer_count, _mission_type, get_current_mission_type_crc());
 
 		} else {
 			PX4_DEBUG("WPM: MISSION_REQUEST_LIST ERROR: busy");
