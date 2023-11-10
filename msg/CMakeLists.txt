@@ -162,7 +162,6 @@ set(msg_files
 	RcChannels.msg
 	RcParameterMap.msg
 	Rpm.msg
-	ActuatorControls.msg
 	RtlTimeEstimate.msg
 	SatelliteInfo.msg
 	SensorAccel.msg
