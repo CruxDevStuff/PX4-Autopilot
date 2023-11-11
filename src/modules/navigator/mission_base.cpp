@@ -167,6 +167,7 @@ MissionBase::on_inactive()
 	_land_detected_sub.update();
 	_vehicle_status_sub.update();
 	_global_pos_sub.update();
+	_home_pos_sub.update();
 
 	parameters_update();
 
@@ -257,6 +258,7 @@ MissionBase::on_active()
 	_land_detected_sub.update();
 	_vehicle_status_sub.update();
 	_global_pos_sub.update();
+	_home_pos_sub.update();
 
 	parameters_update();
 
@@ -691,17 +693,20 @@ MissionBase::checkMissionRestart()
 void
 MissionBase::check_mission_valid()
 {
-	if (_navigator->get_mission_result()->mission_update_counter != _mission.mission_update_counter) {
-		MissionFeasibilityChecker missionFeasibilityChecker(_navigator, _dataman_client);
+	if ((_navigator->get_mission_result()->mission_update_counter != _mission.mission_update_counter)
+	    || (_navigator->get_mission_result()->geofence_update_counter != _mission.geofence_update_counter)
+	    || (_navigator->get_mission_result()->home_position_timestamp != _home_pos_sub.get().timestamp)) {
 
-		bool is_mission_valid =
-			missionFeasibilityChecker.checkMissionFeasible(_mission);
-
-		_navigator->get_mission_result()->valid = is_mission_valid;
 		_navigator->get_mission_result()->mission_update_counter = _mission.mission_update_counter;
+		_navigator->get_mission_result()->geofence_update_counter = _mission.geofence_update_counter;
+		_navigator->get_mission_result()->home_position_timestamp = _home_pos_sub.get().timestamp;
+
+		MissionFeasibilityChecker missionFeasibilityChecker(_navigator, _dataman_client);
+		_navigator->get_mission_result()->valid = missionFeasibilityChecker.checkMissionFeasible(_mission);
 		_navigator->get_mission_result()->seq_total = _mission.count;
 		_navigator->get_mission_result()->seq_reached = -1;
 		_navigator->get_mission_result()->failure = false;
+
 		set_mission_result();
 	}
 }
