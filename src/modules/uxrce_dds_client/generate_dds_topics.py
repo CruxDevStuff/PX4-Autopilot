@@ -98,7 +98,14 @@ def process_message_type(msg_type):
     msg_type['dds_type'] = msg_type['type'].replace("::msg::", "::msg::dds_::") + "_"
     # topic_simple: eg vehicle_status
     msg_type['topic_simple'] = msg_type['topic'].split('/')[-1]
-
+    # topic instance
+    if 'instance' in msg_type:
+        # if instance is given, check if it it a non negative integer
+        if not (type(msg_type['instance']) is int and msg_type['instance'] >= 0) :
+            raise TypeError("`instance` must be a non negative integer")
+    else:
+        # if instance is not given,
+        msg_type['instance'] = -1
 
 for p in msg_map['publications']:
     process_message_type(p)
