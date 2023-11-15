@@ -2413,6 +2413,9 @@ FixedwingPositionControl::Run()
 		_flaps_setpoint = 0.f;
 		_spoilers_setpoint = 0.f;
 
+		// reset level flight estimate
+		_is_level_flight = false;
+
 		// by default we don't want yaw to be contoller directly with rudder
 		_att_sp.fw_control_yaw_wheel = false;
 
@@ -2513,6 +2516,10 @@ FixedwingPositionControl::Run()
 				}
 			}
 		}
+
+		// Publish estimate of level flight
+		_level_flight_estimation_pub.get().timestamp = hrt_absolute_time();
+		_level_flight_estimation_pub.get().is_level_flight = _is_level_flight;
 
 		// if there's any change in landing gear setpoint publish it
 		if (_new_landing_gear_position != old_landing_gear_position
@@ -2709,6 +2716,17 @@ FixedwingPositionControl::tecs_update_pitch_throttle(const float control_interva
 		     hgt_rate_sp);
 
 	tecs_status_publish(alt_sp, airspeed_sp, airspeed_rate_estimate, throttle_trim_adjusted);
+
+	// Estimate if we are in level flight.
+	// Tecs must be running, the height rate setpoint is not set or set to 0 and we are close to the target altitude and target altitude is not moving
+	if (_tecs_is_running && (!PX4_ISFINITE(hgt_rate_sp) || fabsf(hgt_rate_sp) < 0.1f)
+	    && fabsf(_current_altitude - alt_sp) < _param_nav_fw_alt_rad.get()
+	    && fabsf((alt_sp - _last_tecs_alt_sp) / control_interval) < 0.1f) {
+		_is_level_flight = true;
+	}
+
+	_last_tecs_alt_sp = alt_sp;
+
 }
 
 float

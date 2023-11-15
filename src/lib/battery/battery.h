@@ -56,6 +56,7 @@
 #include <uORB/PublicationMulti.hpp>
 #include <uORB/Subscription.hpp>
 #include <uORB/topics/battery_status.h>
+#include <uORB/topics/level_flight_estimation.h>
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/vehicle_thrust_setpoint.h>
 
@@ -155,7 +156,8 @@ private:
 	float computeRemainingTime(float current_a);
 
 	uORB::Subscription _vehicle_thrust_setpoint_0_sub{ORB_ID(vehicle_thrust_setpoint)};
-	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+	uORB::SubscriptionData<vehicle_status_s> _vehicle_status_sub{ORB_ID(vehicle_status)};
+	uORB::SubscriptionData<level_flight_estimation_s> _level_flight_estimation_sub{ORB_ID(level_flight_estimation)};
 	uORB::PublicationMulti<battery_status_s> _battery_status_pub{ORB_ID(battery_status)};
 
 	bool _external_state_of_charge{false}; ///< inticates that the soc is injected and not updated by this library
@@ -168,7 +170,8 @@ private:
 	AlphaFilter<float> _voltage_filter_v;
 	float _current_a{-1};
 	AlphaFilter<float> _current_filter_a;
-	AlphaFilter<float> _current_average_filter_a;
+	AlphaFilter<float>
+	_current_average_filter_a; ///< averaging filter for current. For FW, it is the current in level flight.
 	AlphaFilter<float> _throttle_filter;
 	float _discharged_mah{0.f};
 	float _discharged_mah_loop{0.f};

@@ -72,6 +72,7 @@
 #include <uORB/topics/airspeed_validated.h>
 #include <uORB/topics/landing_gear.h>
 #include <uORB/topics/launch_detection_status.h>
+#include <uORB/topics/level_flight_estimation.h>
 #include <uORB/topics/manual_control_setpoint.h>
 #include <uORB/topics/normalized_unsigned_setpoint.h>
 #include <uORB/topics/npfg_status.h>
@@ -221,6 +222,7 @@ private:
 	uORB::Publication<landing_gear_s> _landing_gear_pub {ORB_ID(landing_gear)};
 	uORB::Publication<normalized_unsigned_setpoint_s> _flaps_setpoint_pub{ORB_ID(flaps_setpoint)};
 	uORB::Publication<normalized_unsigned_setpoint_s> _spoilers_setpoint_pub{ORB_ID(spoilers_setpoint)};
+	uORB::PublicationData<level_flight_estimation_s> _level_flight_estimation_pub{ORB_ID(level_flight_estimation)};
 
 	manual_control_setpoint_s _manual_control_setpoint{};
 	position_setpoint_triplet_s _pos_sp_triplet{};
@@ -396,7 +398,11 @@ private:
 
 	bool _reinitialize_tecs{true};
 	bool _tecs_is_running{false};
+	float _last_tecs_alt_sp{0.f}; //< last tecs altitude setpoint [m]
 	hrt_abstime _time_last_tecs_update{0}; // [us]
+
+	// Level flight estimator
+	bool _is_level_flight{false};
 
 	// VTOL / TRANSITION
 
