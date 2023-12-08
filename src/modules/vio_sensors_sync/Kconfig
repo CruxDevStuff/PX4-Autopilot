@@ -1,0 +1,4 @@
+menuconfig MODULES_VIO_SENSORS_SYNC
+	bool "vio_sensors_sync"
+	default n
+	---help---
