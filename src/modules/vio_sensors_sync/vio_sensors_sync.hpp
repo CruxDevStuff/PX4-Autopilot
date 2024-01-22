@@ -17,6 +17,8 @@
 #include <uORB/topics/sensor_accel.h>
 #include <uORB/topics/vehicle_status.h>
 
+#include <sensors/Integrator.hpp>
+
 using namespace time_literals;
 
 
@@ -35,6 +37,8 @@ public:
 	/** @see ModuleBase */
 	static int print_usage(const char *reason = nullptr);
 
+	void stop();
+
 	bool init();
 
 	int print_status() override;
@@ -42,7 +46,17 @@ public:
 private:
 	void Run() override;
 
-	// Performance counters
+	void update_intervalometer();
+
+
+	// performance counters
 	perf_counter_t	_loop_perf{perf_alloc(PC_ELAPSED, MODULE_NAME": cycle")};
 	perf_counter_t	_loop_interval_perf{perf_alloc(PC_INTERVAL, MODULE_NAME": interval")};
+
+	struct hrt_call _engagecall {};
+	struct hrt_call _disengagecall {};
+
+	static void engage(void *arg);
+
+	static void disengage(void *arg);
 };
