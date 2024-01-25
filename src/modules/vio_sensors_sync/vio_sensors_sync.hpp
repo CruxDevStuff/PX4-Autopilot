@@ -16,6 +16,7 @@
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/sensor_accel.h>
 #include <uORB/topics/vehicle_status.h>
+#include <uORB/topics/vio_trigger_data.h>
 
 #include <sensors/Integrator.hpp>
 
@@ -47,11 +48,24 @@ private:
 	void Run() override;
 
 	void update_intervalometer();
-
+	int update_imu_data();
+	int publish_vio_trigger_data();
 
 	// performance counters
 	perf_counter_t	_loop_perf{perf_alloc(PC_ELAPSED, MODULE_NAME": cycle")};
 	perf_counter_t	_loop_interval_perf{perf_alloc(PC_INTERVAL, MODULE_NAME": interval")};
+
+	struct vio_trigger_sample {
+		uint64_t time_us;
+		matrix::Vector3f accel_data;
+	};
+
+	vio_trigger_sample test_sample;
+
+	sensors::IntegratorConing _accel_integrator;
+
+	uORB::SubscriptionCallbackWorkItem _accel_sensor_sub{this, ORB_ID(sensor_accel)};
+	uORB::Publication<vio_trigger_data_s> _vio_trigger_pub{ORB_ID(vio_trigger_data)};
 
 	struct hrt_call _engagecall {};
 	struct hrt_call _disengagecall {};

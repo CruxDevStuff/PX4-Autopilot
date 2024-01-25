@@ -47,6 +47,11 @@ publications:
   - topic: /fmu/out/vehicle_trajectory_waypoint_desired
     type: px4_msgs::msg::VehicleTrajectoryWaypoint
 
+  - topic: /fmu/out/vio_trigger_data
+    type: px4_msgs::msg::VioTriggerData
+
+
+
 subscriptions:
 
   - topic: /fmu/in/offboard_control_mode
